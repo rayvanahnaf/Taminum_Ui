@@ -1,43 +1,40 @@
-// To parse this JSON data, do
-//
-//     final authResponseModel = authResponseModelFromJson(jsonString);
-
+import 'package:meta/meta.dart';
 import 'dart:convert';
 
-AuthResponseModel authResponseModelFromJson(String str) => AuthResponseModel.fromJson(json.decode(str));
-
-String authResponseModelToJson(AuthResponseModel data) => json.encode(data.toJson());
-
 class AuthResponseModel {
-  String accessToken;
-  User user;
+  final String accessToken;
+  final User user;
 
   AuthResponseModel({
     required this.accessToken,
     required this.user,
   });
 
-  factory AuthResponseModel.fromJson(Map<String, dynamic> json) => AuthResponseModel(
+  factory AuthResponseModel.fromJson(String str) => AuthResponseModel.fromMap(json.decode(str));
+
+  String toJson() => json.encode(toMap());
+
+  factory AuthResponseModel.fromMap(Map<String, dynamic> json) => AuthResponseModel(
     accessToken: json["access_token"],
-    user: User.fromJson(json["user"]),
+    user: User.fromMap(json["user"]),
   );
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
     "access_token": accessToken,
-    "user": user.toJson(),
+    "user": user.toMap(),
   };
 }
 
 class User {
-  int id;
-  String name;
-  String email;
-  DateTime emailVerifiedAt;
-  dynamic twoFactorSecret;
-  dynamic twoFactorRecoveryCodes;
-  dynamic twoFactorConfirmedAt;
-  DateTime createdAt;
-  DateTime updatedAt;
+  final int id;
+  final String name;
+  final String email;
+  final DateTime emailVerifiedAt;
+  final dynamic twoFactorSecret;
+  final dynamic twoFactorRecoveryCodes;
+  final dynamic twoFactorConfirmedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   User({
     required this.id,
@@ -51,7 +48,11 @@ class User {
     required this.updatedAt,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
+  factory User.fromJson(String str) => User.fromMap(json.decode(str));
+
+  String toJson() => json.encode(toMap());
+
+  factory User.fromMap(Map<String, dynamic> json) => User(
     id: json["id"],
     name: json["name"],
     email: json["email"],
@@ -63,7 +64,7 @@ class User {
     updatedAt: DateTime.parse(json["updated_at"]),
   );
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
     "id": id,
     "name": name,
     "email": email,

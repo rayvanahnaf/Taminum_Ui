@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_pos/models/product.dart';
+import 'package:flutter_pos/presentation/auth/bloc/logout/logout_bloc.dart';
 import 'package:flutter_pos/presentation/order/pages/order_confirmation_page.dart';
 import '../../../core/preferences/color.dart';
 import '../../auth/pages/login_page.dart';
@@ -155,49 +157,65 @@ class _PosPageState extends State<PosPage> {
                       ],
                     ),
                   ),
-
-                  PopupMenuButton<String>(
-                    icon: Icon(
-                      Icons.more_vert,
-                      color: secondaryTextColor,
-                    ),
-                    onSelected: (String value) {
-                      switch (value) {
-                        case 'settings':
-                          Navigator.pushNamed(context, '/settings');
-                          break;
-                        case 'profile':
-                          Navigator.pushNamed(context, '/profile');
-                          break;
-                        case 'logout':
-                          break;
+                  BlocListener<LogoutBloc, LogoutState>(
+                    listener: (context, state) {
+                      if (state is LogoutSuccess) {
+                        // ✅ Print info ke console
+                        print('🔴 Logout Berhasil');
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const LoginPage()),
+                              (route) => false,
+                        );
+                      } else if (state is LogoutFailure) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(state.message)),
+                        );
                       }
                     },
-                    itemBuilder: (BuildContext context) => [
-                      const PopupMenuItem<String>(
-                        value: 'settings',
-                        child: ListTile(
-                          leading: Icon(Icons.settings),
-                          title: Text('Settings'),
-                        ),
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(
+                        Icons.more_vert,
+                        color: Colors.black,
                       ),
-                      const PopupMenuItem<String>(
-                        value: 'profile',
-                        child: ListTile(
-                          leading: Icon(Icons.person),
-                          title: Text('Profile'),
+                      onSelected: (String value) {
+                        switch (value) {
+                          case 'settings':
+                            Navigator.pushNamed(context, '/settings');
+                            break;
+                          case 'profile':
+                            Navigator.pushNamed(context, '/profile');
+                            break;
+                          case 'logout':
+                          // ✅ Trigger logout event
+                            context.read<LogoutBloc>().add(LogoutButtonPressed());
+                            break;
+                        }
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        const PopupMenuItem<String>(
+                          value: 'settings',
+                          child: ListTile(
+                            leading: Icon(Icons.settings),
+                            title: Text('Settings'),
+                          ),
                         ),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'logout',
-                        child: ListTile(
-                          leading: Icon(Icons.logout),
-                          title: Text('Logout'),
+                        const PopupMenuItem<String>(
+                          value: 'profile',
+                          child: ListTile(
+                            leading: Icon(Icons.person),
+                            title: Text('Profile'),
+                          ),
                         ),
-                      ),
-                    ],
-                  )
-
+                        const PopupMenuItem<String>(
+                          value: 'logout',
+                          child: ListTile(
+                            leading: Icon(Icons.logout),
+                            title: Text('Logout'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
